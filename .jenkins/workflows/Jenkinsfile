@@ -21,14 +21,18 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                echo '📦 Checking out code from main branch...'
                 git url: 'https://github.com/ttrungn/ticket-prime-user-fe.git', branch: 'main'
+                echo '✅ Checkout complete.'
             }
         }
 
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
+                    echo '🚀 Initializing Terraform...'
                     sh 'terraform init'
+                    echo '✅ Terraform init done.'
                 }
             }
         }
@@ -36,7 +40,9 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
+                    echo '🧠 Running Terraform plan...'
                     sh 'terraform plan'
+                    echo '✅ Terraform plan complete.'
                 }
             }
         }
@@ -44,29 +50,37 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
+                    echo '⚙️ Applying Terraform changes...'
                     sh 'terraform apply -auto-approve'
+                    echo '✅ Terraform apply completed.'
                 }
             }
         }
 
         stage('Build Application') {
             steps {
+                echo '📦 Installing npm dependencies...'
                 sh 'npm install'
+                echo '🏗️ Building React application...'
                 sh 'npm run build'
+                echo '✅ Build complete.'
             }
         }
 
         stage('Deploy to S3') {
             steps {
+                echo "☁️ Deploying to S3 bucket: $TF_VAR_bucket_name..."
                 sh 'aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete'
+                echo '✅ Deployment to S3 completed.'
             }
         }
     }
 
     post {
         always {
+            echo '🧹 Cleaning workspace...'
             cleanWs()
+            echo '✅ Cleanup done.'
         }
     }
 }
-
