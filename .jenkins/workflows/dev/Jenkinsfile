@@ -36,12 +36,20 @@ pipeline {
                     sh '''
                         set -e
 
-                        # Check if the bucket already exists
                         echo "🔍 Checking if bucket $TF_VAR_state_bucket_name exists..."
                         if aws s3api head-bucket --bucket "$TF_VAR_state_bucket_name" 2>/dev/null; then
                             echo "✅ Bucket exists — importing into Terraform..."
                             terraform init -input=false
-                            terraform import aws_s3_bucket.state_bucket "$TF_VAR_state_bucket_name"
+
+                            terraform import aws_s3_bucket.state_bucket "$TF_VAR_state_bucket_name" || {
+                                echo "⚠️  Bucket already in state or import failed"
+                            }
+
+                            # Import dependencies if needed
+                            terraform import aws_s3_bucket_versioning.state_bucket_versioning "$TF_VAR_state_bucket_name" || true
+                            terraform import aws_s3_bucket_public_access_block.state_bucket_block "$TF_VAR_state_bucket_name" || true
+
+                            echo "✅ All required resources imported — skipping apply."
                         else
                             echo "🪣 Bucket does not exist — creating with Terraform..."
                             terraform init -input=false
@@ -53,6 +61,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Terraform Provision Init') {
             steps {

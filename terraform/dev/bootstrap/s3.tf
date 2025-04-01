@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "state_bucket" {
+resource "aws_s3_bucket" "fe_bucket" {
   bucket = var.state_bucket_name
 }
 
