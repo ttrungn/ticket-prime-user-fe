@@ -23,21 +23,26 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                sh 'cd terraform'
-                sh 'terraform init'
+                dir('terraform') {
+                    sh 'terraform init'
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan'
+                dir('terraform') {
+                    sh 'terraform plan'
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
                 input message: 'Approve Terraform Apply?', ok: 'Apply'
-                sh 'terraform apply -auto-approve'
+                dir('terraform') {
+                    sh 'terraform apply -auto-approve'
+                }
             }
         }
 
