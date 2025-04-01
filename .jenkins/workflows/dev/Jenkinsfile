@@ -22,53 +22,51 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo '📦 Checking out code from main branch...'
+                echo 'INFO: Starting source code checkout from Git repository (main branch)...'
                 git url: 'https://github.com/ttrungn/ticket-prime-user-fe.git', branch: 'main'
-                echo '✅ Checkout complete.'
+                echo 'INFO: Git checkout completed successfully.'
             }
         }
 
         stage('Terraform Bootstrap') {
             steps {
                 dir('terraform/dev/bootstrap') {
-                    echo '🧱 Bootstrapping Terraform state bucket...'
+                    echo 'INFO: Starting Terraform bootstrap process...'
 
                     sh '''
                         set -e
 
-                        echo "🔍 Checking if bucket $TF_VAR_state_bucket_name exists..."
+                        echo "INFO: Checking if S3 bucket '$TF_VAR_state_bucket_name' exists..."
                         if aws s3api head-bucket --bucket "$TF_VAR_state_bucket_name" 2>/dev/null; then
-                            echo "✅ Bucket exists — importing into Terraform..."
+                            echo "INFO: S3 bucket exists. Importing resources into Terraform state."
                             terraform init -input=false
 
                             terraform import aws_s3_bucket.state_bucket "$TF_VAR_state_bucket_name" || {
-                                echo "⚠️  Bucket already in state or import failed"
+                                echo "WARNING: Bucket may already be imported or import failed."
                             }
 
-                            # Import dependencies if needed
                             terraform import aws_s3_bucket_versioning.state_bucket_versioning "$TF_VAR_state_bucket_name" || true
                             terraform import aws_s3_bucket_public_access_block.state_bucket_block "$TF_VAR_state_bucket_name" || true
 
-                            echo "✅ All required resources imported — skipping apply."
+                            echo "INFO: Terraform resource import complete. Skipping creation step."
                         else
-                            echo "🪣 Bucket does not exist — creating with Terraform..."
+                            echo "INFO: S3 bucket does not exist. Proceeding to create it via Terraform."
                             terraform init -input=false
                             terraform apply -auto-approve
                         fi
                     '''
 
-                    echo '✅ Bootstrap complete.'
+                    echo 'INFO: Terraform bootstrap stage completed.'
                 }
             }
         }
 
-
         stage('Terraform Provision Init') {
             steps {
                 dir('terraform/dev/provision') {
-                    echo '🔐 Initializing Terraform with secure backend config...'
+                    echo 'INFO: Initializing Terraform with backend configuration...'
 
-                    withEnv(["TF_STATE_KEY=" + "$TF_VAR_bucket_name" + "/terraform.tfstate"]) {
+                    withEnv(['TF_STATE_KEY=' + "$TF_VAR_bucket_name" + "/terraform.tfstate"]) {
                         sh '''
                             terraform init -reconfigure \
                             -backend-config="bucket=$TF_VAR_state_bucket_name" \
@@ -78,7 +76,7 @@ pipeline {
                         '''
                     }
 
-                    echo '✅ Terraform init done.'
+                    echo 'INFO: Terraform initialization completed.'
                 }
             }
         }
@@ -86,9 +84,9 @@ pipeline {
         stage('Terraform Provision Plan') {
             steps {
                 dir('terraform/dev/provision') {
-                    echo '🧠 Running Terraform plan...'
+                    echo 'INFO: Running Terraform plan to preview infrastructure changes...'
                     sh 'terraform plan'
-                    echo '✅ Terraform plan complete.'
+                    echo 'INFO: Terraform plan execution completed.'
                 }
             }
         }
@@ -96,37 +94,37 @@ pipeline {
         stage('Terraform Provision Apply') {
             steps {
                 dir('terraform/dev/provision') {
-                    echo '⚙️ Applying Terraform changes...'
+                    echo 'INFO: Applying Terraform configuration changes to AWS...'
                     sh 'terraform apply -auto-approve'
-                    echo '✅ Terraform apply completed.'
+                    echo 'INFO: Terraform apply step completed successfully.'
                 }
             }
         }
 
         stage('Build Application') {
             steps {
-                echo '📦 Installing npm dependencies...'
+                echo 'INFO: Installing Node.js dependencies via npm...'
                 sh 'npm install'
-                echo '🏗️ Building React application...'
+                echo 'INFO: Building React application using npm script...'
                 sh 'npm run build'
-                echo '✅ Build complete.'
+                echo 'INFO: React application build process completed.'
             }
         }
 
         stage('Deploy to S3') {
             steps {
-                echo "☁️ Deploying to S3 bucket: $TF_VAR_bucket_name..."
+                echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
                 sh 'aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete'
-                echo '✅ Deployment to S3 completed.'
+                echo 'INFO: Static files successfully deployed to S3.'
             }
         }
     }
 
     post {
         always {
-            echo '🧹 Cleaning workspace...'
+            echo 'INFO: Cleaning up workspace to free resources...'
             cleanWs()
-            echo '✅ Cleanup done.'
+            echo 'INFO: Workspace cleanup complete.'
         }
     }
 }
