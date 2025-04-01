@@ -1,9 +1,7 @@
-# S3 bucket to store Terraform state
 resource "aws_s3_bucket" "state_bucket" {
   bucket = var.state_bucket_name
 }
 
-# Enable versioning (recommended for rollback and safety)
 resource "aws_s3_bucket_versioning" "state_bucket_versioning" {
   bucket = aws_s3_bucket.state_bucket.id
 
@@ -12,7 +10,6 @@ resource "aws_s3_bucket_versioning" "state_bucket_versioning" {
   }
 }
 
-# Block all public access (required for sensitive infra)
 resource "aws_s3_bucket_public_access_block" "state_bucket_block" {
   bucket = aws_s3_bucket.state_bucket.id
 
