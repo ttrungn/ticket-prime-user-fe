@@ -23,14 +23,15 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'INFO: Starting source code checkout from Git repository (main branch)...'
-                git url: 'https://github.com/ttrungn/ticket-prime-user-fe.git', branch: 'main'
+                git url: 'https://github.com/ttrungn/ticket-prime-user-fe.git',
+                    branch: 'main'
                 echo 'INFO: Git checkout completed successfully.'
             }
         }
 
         stage('Terraform Bootstrap') {
             when {
-                changeset "**/terraform/dev/**"
+                changeset '**/terraform/dev/**'
             }
             steps {
                 dir('terraform/dev/bootstrap') {
@@ -38,18 +39,22 @@ pipeline {
 
                     sh '''
                         set -e
-
                         echo "INFO: Checking if S3 bucket '$TF_VAR_state_bucket_name' exists..."
+
                         if aws s3api head-bucket --bucket "$TF_VAR_state_bucket_name" 2>/dev/null; then
                             echo "INFO: S3 bucket exists. Importing resources into Terraform state."
+
                             terraform init -input=false
 
                             terraform import aws_s3_bucket.state_bucket "$TF_VAR_state_bucket_name" || {
                                 echo "WARNING: Bucket may already be imported or import failed."
                             }
 
-                            terraform import aws_s3_bucket_versioning.state_bucket_versioning "$TF_VAR_state_bucket_name" || true
-                            terraform import aws_s3_bucket_public_access_block.state_bucket_block "$TF_VAR_state_bucket_name" || true
+                            terraform import aws_s3_bucket_versioning.state_bucket_versioning \
+                                "$TF_VAR_state_bucket_name" || true
+
+                            terraform import aws_s3_bucket_public_access_block.state_bucket_block \
+                                "$TF_VAR_state_bucket_name" || true
 
                             echo "INFO: Terraform resource import complete. Skipping creation step."
                         else
@@ -66,13 +71,13 @@ pipeline {
 
         stage('Terraform Provision') {
             when {
-                changeset "**/terraform/dev/**"
+                changeset '**/terraform/dev/**'
             }
             steps {
                 dir('terraform/dev/provision') {
                     echo 'INFO: Starting Terraform provisioning workflow...'
 
-                    withEnv(['TF_STATE_KEY=' + "$TF_VAR_bucket_name" + "/terraform.tfstate"]) {
+                    withEnv(["TF_STATE_KEY=${TF_VAR_bucket_name}/terraform.tfstate"]) {
                         sh '''
                             echo "INFO: Initializing Terraform backend..."
                             terraform init -reconfigure \
@@ -107,7 +112,9 @@ pipeline {
         stage('Deploy to S3') {
             steps {
                 echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
-                sh 'aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete'
+                sh '''
+                    aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete
+                '''
                 echo 'INFO: Static files successfully deployed to S3.'
             }
         }
@@ -121,3 +128,4 @@ pipeline {
         }
     }
 }
+
