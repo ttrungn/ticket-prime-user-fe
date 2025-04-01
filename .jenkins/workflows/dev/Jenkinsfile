@@ -11,7 +11,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('TP_FE_AWS_SECRET_KEY')
 
         // Terraform variables as environment variables
-        TF_STATE_BUCKET              = credentials('TP_FE_TF_BACKEND_BUCKET')
+        TF_VAR_state_bucket_name     = credentials('TP_FE_TF_STATE_BUCKET')
         TF_VAR_aws_region            = credentials('TP_FE_AWS_REGION_DEV')
         TF_VAR_cloudfront_acm_region = credentials('TP_FE_AWS_CLOUDFRONT_ACM_REGION')
         TF_VAR_domain_name           = credentials('TP_FE_AWS_DOMAIN_NAME_DEV')
@@ -28,15 +28,41 @@ pipeline {
             }
         }
 
-        stage('Terraform Init') {
+        stage('Terraform Bootstrap') {
+            stage {
+                dir('terraform/dev/bootstrap') {
+                    echo '🧱 Bootstrapping Terraform state bucket...'
+
+                    sh '''
+                        set -e
+
+                        # Check if the bucket already exists
+                        echo "🔍 Checking if bucket $TF_VAR_state_bucket_name exists..."
+                        if aws s3api head-bucket --bucket "$TF_VAR_state_bucket_name" 2>/dev/null; then
+                            echo "✅ Bucket exists — importing into Terraform..."
+                            terraform init -input=false
+                            terraform import aws_s3_bucket.state_bucket "$TF_VAR_state_bucket_name"
+                        else
+                            echo "🪣 Bucket does not exist — creating with Terraform..."
+                            terraform init -input=false
+                            terraform apply -auto-approve
+                        fi
+                    '''
+
+                    echo '✅ Bootstrap complete.'
+                }
+            }
+        }
+
+        stage('Terraform Provision Init') {
             steps {
-                dir('terraform') {
+                dir('terraform/dev/provision') {
                     echo '🔐 Initializing Terraform with secure backend config...'
 
-                    withEnv(["TF_STATE_KEY=${env.TF_VAR_bucket_name}/terraform.tfstate"]) {
+                    withEnv(["TF_STATE_KEY=" + "$TF_VAR_bucket_name" + "/terraform.tfstate"]) {
                         sh '''
                             terraform init -reconfigure \
-                            -backend-config="bucket=$TF_STATE_BUCKET" \
+                            -backend-config="bucket=$TF_VAR_state_bucket_name" \
                             -backend-config="key=$TF_STATE_KEY" \
                             -backend-config="region=$TF_VAR_aws_region" \
                             -backend-config="encrypt=true"
@@ -48,9 +74,9 @@ pipeline {
             }
         }
 
-        stage('Terraform Plan') {
+        stage('Terraform Provision Plan') {
             steps {
-                dir('terraform') {
+                dir('terraform/dev/provision') {
                     echo '🧠 Running Terraform plan...'
                     sh 'terraform plan'
                     echo '✅ Terraform plan complete.'
@@ -58,9 +84,9 @@ pipeline {
             }
         }
 
-        stage('Terraform Apply') {
+        stage('Terraform Provision Apply') {
             steps {
-                dir('terraform') {
+                dir('terraform/dev/provision') {
                     echo '⚙️ Applying Terraform changes...'
                     sh 'terraform apply -auto-approve'
                     echo '✅ Terraform apply completed.'

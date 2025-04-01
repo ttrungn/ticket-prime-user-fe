@@ -18,6 +18,11 @@ variable "bucket_name" {
   type = string
 }
 
+variable "state_bucket_name" {
+  description = "The name of the S3 bucket to store the terraform state"
+  type = string
+}
+
 variable "hosted_zone_id" {
   description = "The ID of the Route 53 hosted zone"
   type = string
