@@ -29,7 +29,7 @@ pipeline {
         }
 
         stage('Terraform Bootstrap') {
-            stage {
+            steps {
                 dir('terraform/dev/bootstrap') {
                     echo '🧱 Bootstrapping Terraform state bucket...'
 
