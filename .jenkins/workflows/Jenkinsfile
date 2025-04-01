@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // AWS credentials injected from Jenkins credentials store
-        AWS_ACCESS_KEY_ID     = credentials('TP_FE_AWS_ACCESS_KEY')
+        AWS_ACCESS_KEY_ID     = credentials('TP_FE_AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('TP_FE_AWS_SECRET_KEY')
 
         // Terraform variables as environment variables
