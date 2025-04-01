@@ -29,6 +29,9 @@ pipeline {
         }
 
         stage('Terraform Bootstrap') {
+            when {
+                changeset "**/terraform/dev/**"
+            }
             steps {
                 dir('terraform/dev/bootstrap') {
                     echo 'INFO: Starting Terraform bootstrap process...'
@@ -61,42 +64,32 @@ pipeline {
             }
         }
 
-        stage('Terraform Provision Init') {
+        stage('Terraform Provision') {
+            when {
+                changeset "**/terraform/dev/**"
+            }
             steps {
                 dir('terraform/dev/provision') {
-                    echo 'INFO: Initializing Terraform with backend configuration...'
+                    echo 'INFO: Starting Terraform provisioning workflow...'
 
                     withEnv(['TF_STATE_KEY=' + "$TF_VAR_bucket_name" + "/terraform.tfstate"]) {
                         sh '''
+                            echo "INFO: Initializing Terraform backend..."
                             terraform init -reconfigure \
-                            -backend-config="bucket=$TF_VAR_state_bucket_name" \
-                            -backend-config="key=$TF_STATE_KEY" \
-                            -backend-config="region=$TF_VAR_aws_region" \
-                            -backend-config="encrypt=true"
+                                -backend-config="bucket=$TF_VAR_state_bucket_name" \
+                                -backend-config="key=$TF_STATE_KEY" \
+                                -backend-config="region=$TF_VAR_aws_region" \
+                                -backend-config="encrypt=true"
+
+                            echo "INFO: Running Terraform plan..."
+                            terraform plan
+
+                            echo "INFO: Applying Terraform changes..."
+                            terraform apply -auto-approve
                         '''
                     }
 
-                    echo 'INFO: Terraform initialization completed.'
-                }
-            }
-        }
-
-        stage('Terraform Provision Plan') {
-            steps {
-                dir('terraform/dev/provision') {
-                    echo 'INFO: Running Terraform plan to preview infrastructure changes...'
-                    sh 'terraform plan'
-                    echo 'INFO: Terraform plan execution completed.'
-                }
-            }
-        }
-
-        stage('Terraform Provision Apply') {
-            steps {
-                dir('terraform/dev/provision') {
-                    echo 'INFO: Applying Terraform configuration changes to AWS...'
-                    sh 'terraform apply -auto-approve'
-                    echo 'INFO: Terraform apply step completed successfully.'
+                    echo 'INFO: Terraform provisioning stage completed.'
                 }
             }
         }
