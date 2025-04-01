@@ -7,7 +7,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('TP_FE_AWS_SECRET_KEY')
 
         // Terraform variables as environment variables
-        TF_VAR_region                = credentials('TP_FE_AWS_REGION_DEV')
+        TF_VAR_aws_region                = credentials('TP_FE_AWS_REGION_DEV')
         TF_VAR_cloudfront_acm_region = credentials('TP_FE_AWS_CLOUDFRONT_ACM_REGION')
         TF_VAR_domain_name           = credentials('TP_FE_AWS_DOMAIN_NAME_DEV')
         TF_VAR_hosted_zone_id        = credentials('TP_FE_AWS_HOSTED_ZONE_ID')
