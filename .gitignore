@@ -21,3 +21,30 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local .terraform directories
+.terraform/
+
+# Terraform plan files
+*.tfplan
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Override files which are not meant to be committed
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Sensitive variable files
+*.tfvars
+*.tfvars.json
+
+# CLI configuration files
+.terraform.rc
+terraform.rc
