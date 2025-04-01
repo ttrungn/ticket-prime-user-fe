@@ -11,6 +11,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('TP_FE_AWS_SECRET_KEY')
 
         // Terraform variables as environment variables
+        TF_STATE_BUCKET              = credentials('TP_FE_TF_BACKEND_BUCKET')
         TF_VAR_aws_region            = credentials('TP_FE_AWS_REGION_DEV')
         TF_VAR_cloudfront_acm_region = credentials('TP_FE_AWS_CLOUDFRONT_ACM_REGION')
         TF_VAR_domain_name           = credentials('TP_FE_AWS_DOMAIN_NAME_DEV')
@@ -30,8 +31,18 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    echo '🚀 Initializing Terraform...'
-                    sh 'terraform init'
+                    echo '🔐 Initializing Terraform with secure backend config...'
+
+                    withEnv(["TF_STATE_KEY=${env.TF_VAR_bucket_name}/terraform.tfstate"]) {
+                        sh '''
+                            terraform init -reconfigure \
+                            -backend-config="bucket=$TF_STATE_BUCKET" \
+                            -backend-config="key=$TF_STATE_KEY" \
+                            -backend-config="region=$TF_VAR_aws_region" \
+                            -backend-config="encrypt=true"
+                        '''
+                    }
+
                     echo '✅ Terraform init done.'
                 }
             }

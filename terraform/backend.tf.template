@@ -1,0 +1,8 @@
+terraform {
+  backend "s3" {
+    bucket         = "your bucket to store the terraform state"
+    key            = "your key to store the terraform state"
+    region         = "bucket region"
+    encrypt        = true
+  }
+}
