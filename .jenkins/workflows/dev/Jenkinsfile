@@ -30,6 +30,9 @@ pipeline {
         }
 
         stage('Terraform Bootstrap') {
+            when {
+                changeset '**/terraform/dev/bootstrap/**'
+            }
             steps {
                 dir('terraform/dev/bootstrap') {
                     echo 'INFO: Starting Terraform bootstrap process...'
@@ -47,14 +50,20 @@ pipeline {
                             terraform state list | grep -q 'aws_s3_bucket.state_bucket' || \
                                 terraform import aws_s3_bucket.state_bucket "${TF_VAR_state_bucket_name}"
 
-                            terraform state list | grep -q 'aws_s3_bucket_versioning.state_bucket_versioning' || \
-                                terraform import aws_s3_bucket_versioning.state_bucket_versioning "${TF_VAR_state_bucket_name}"
+                            terraform state list | \
+                                grep -q 'aws_s3_bucket_versioning.state_bucket_versioning' || \
+                                terraform import aws_s3_bucket_versioning.state_bucket_versioning \
+                                "${TF_VAR_state_bucket_name}"
 
-                            terraform state list | grep -q 'aws_s3_bucket_lifecycle_configuration.state_bucket_lifecycle_config' || \
-                                terraform import aws_s3_bucket_lifecycle_configuration.state_bucket_lifecycle_config "${TF_VAR_state_bucket_name}"
+                            terraform state list | \
+                                grep -q 'aws_s3_bucket_lifecycle_configuration.state_bucket_lifecycle_config' || \
+                                terraform import aws_s3_bucket_lifecycle_configuration.state_bucket_lifecycle_config \
+                                "${TF_VAR_state_bucket_name}"
 
-                            terraform state list | grep -q 'aws_s3_bucket_public_access_block.state_bucket_block' || \
-                                terraform import aws_s3_bucket_public_access_block.state_bucket_block "${TF_VAR_state_bucket_name}"
+                            terraform state list | \
+                                grep -q 'aws_s3_bucket_public_access_block.state_bucket_block' || \
+                                terraform import aws_s3_bucket_public_access_block.state_bucket_block \
+                                "${TF_VAR_state_bucket_name}"
                         else
                             echo "INFO: S3 bucket does not exist. Terraform will create it."
                         fi
@@ -71,9 +80,9 @@ pipeline {
 
 
         stage('Terraform Provision') {
-            // when {
-            //     changeset '**/terraform/dev/**'
-            // }
+            when {
+                changeset '**/terraform/dev/provision/**'
+            }
             steps {
                 dir('terraform/dev/provision') {
                     echo 'INFO: Starting Terraform provisioning workflow...'
@@ -89,10 +98,10 @@ pipeline {
                                 -backend-config="encrypt=true"
 
                             echo "INFO: Running Terraform plan..."
-                            terraform plan
+                            terraform plan -input=false -out=tfplan
 
                             echo "INFO: Applying Terraform changes..."
-                            terraform apply -destroy -auto-approve
+                            terraform apply -auto-approve tfplan
                         '''
                     }
 
@@ -101,25 +110,25 @@ pipeline {
             }
         }
 
-        // stage('Build Application') {
-        //     steps {
-        //         echo 'INFO: Installing Node.js dependencies via npm...'
-        //         sh 'npm install'
-        //         echo 'INFO: Building React application using npm script...'
-        //         sh 'npm run build'
-        //         echo 'INFO: React application build process completed.'
-        //     }
-        // }
+        stage('Build Application') {
+            steps {
+                echo 'INFO: Installing Node.js dependencies via npm...'
+                sh 'npm install'
+                echo 'INFO: Building React application using npm script...'
+                sh 'npm run build'
+                echo 'INFO: React application build process completed.'
+            }
+        }
 
-        // stage('Deploy to S3') {
-        //     steps {
-        //         echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
-        //         sh '''
-        //             aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete
-        //         '''
-        //         echo 'INFO: Static files successfully deployed to S3.'
-        //     }
-        // }
+        stage('Deploy to S3') {
+            steps {
+                echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
+                sh '''
+                    aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete
+                '''
+                echo 'INFO: Static files successfully deployed to S3.'
+            }
+        }
     }
 
     post {
