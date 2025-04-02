@@ -30,9 +30,9 @@ pipeline {
         }
 
         stage('Terraform Bootstrap') {
-            when {
-                changeset '**/terraform/dev/**'
-            }
+            // when {
+            //     changeset '**/terraform/dev/**'
+            // }
             steps {
                 dir('terraform/dev/bootstrap') {
                     echo 'INFO: Starting Terraform bootstrap process...'
