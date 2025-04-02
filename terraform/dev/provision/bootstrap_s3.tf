@@ -1,9 +1,5 @@
-resource "aws_s3_bucket" "state_bucket" {
+data "aws_s3_bucket" "state_bucket" {
   bucket = var.state_bucket_name
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "state_bucket_lifecycle_config" {
