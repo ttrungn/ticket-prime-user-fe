@@ -56,7 +56,8 @@ pipeline {
                             terraform import aws_s3_bucket_public_access_block.state_bucket_block \
                                 "$TF_VAR_state_bucket_name" || true
 
-                            echo "INFO: Terraform resource import complete. Skipping creation step."
+                            echo "INFO: Terraform resource import complete. Applying changes..."
+                            terraform apply -auto-approve
                         else
                             echo "INFO: S3 bucket does not exist. Proceeding to create it via Terraform."
                             terraform init -input=false
