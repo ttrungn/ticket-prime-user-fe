@@ -30,43 +30,38 @@ pipeline {
         }
 
         stage('Terraform Bootstrap') {
-            // when {
-            //     changeset '**/terraform/dev/**'
-            // }
             steps {
                 dir('terraform/dev/bootstrap') {
                     echo 'INFO: Starting Terraform bootstrap process...'
 
                     sh '''
                         set -e
-                        echo "INFO: Checking if S3 bucket '$TF_VAR_state_bucket_name' exists..."
 
-                        if aws s3api head-bucket --bucket "$TF_VAR_state_bucket_name" 2>/dev/null; then
-                            echo "INFO: S3 bucket exists. Importing resources into Terraform state."
+                        echo "INFO: Initializing Terraform..."
+                        terraform init -input=false
 
-                            terraform init -input=false
+                        echo "INFO: Checking if S3 bucket '${TF_VAR_state_bucket_name}' exists..."
+                        if aws s3api head-bucket --bucket "${TF_VAR_state_bucket_name}" 2>/dev/null; then
+                            echo "INFO: S3 bucket exists. Importing resources into Terraform state if needed..."
 
-                            terraform import aws_s3_bucket.state_bucket "$TF_VAR_state_bucket_name" || {
-                                echo "WARNING: Bucket may already be imported or import failed."
-                            }
+                            terraform state list | grep -q 'aws_s3_bucket.state_bucket' || \
+                                terraform import aws_s3_bucket.state_bucket "${TF_VAR_state_bucket_name}"
 
-                            terraform import aws_s3_bucket_versioning.state_bucket_versioning \
-                                "$TF_VAR_state_bucket_name" || true
+                            terraform state list | grep -q 'aws_s3_bucket_versioning.state_bucket_versioning' || \
+                                terraform import aws_s3_bucket_versioning.state_bucket_versioning "${TF_VAR_state_bucket_name}"
 
-                            terraform import aws_s3_bucket_lifecycle_configuration.state_bucket_lifecycle_config \
-                                "$TF_VAR_state_bucket_name" || true
+                            terraform state list | grep -q 'aws_s3_bucket_lifecycle_configuration.state_bucket_lifecycle_config' || \
+                                terraform import aws_s3_bucket_lifecycle_configuration.state_bucket_lifecycle_config "${TF_VAR_state_bucket_name}"
 
-                            terraform import aws_s3_bucket_public_access_block.state_bucket_block \
-                                "$TF_VAR_state_bucket_name" || true
-
-                            echo "INFO: Terraform resource import complete. Applying changes..."
-                            terraform apply -auto-approve
+                            terraform state list | grep -q 'aws_s3_bucket_public_access_block.state_bucket_block' || \
+                                terraform import aws_s3_bucket_public_access_block.state_bucket_block "${TF_VAR_state_bucket_name}"
                         else
-                            echo "INFO: S3 bucket does not exist. Proceeding to create it via Terraform."
-                            terraform init -input=false
-                            echo "INFO: Applying changes..."
-                            terraform apply -auto-approve
+                            echo "INFO: S3 bucket does not exist. Terraform will create it."
                         fi
+
+                        echo "INFO: Running Terraform plan and apply..."
+                        terraform plan -input=false -out=tfplan
+                        terraform apply -input=false tfplan
                     '''
 
                     echo 'INFO: Terraform bootstrap stage completed.'
@@ -74,10 +69,11 @@ pipeline {
             }
         }
 
+
         stage('Terraform Provision') {
-            when {
-                changeset '**/terraform/dev/**'
-            }
+            // when {
+            //     changeset '**/terraform/dev/**'
+            // }
             steps {
                 dir('terraform/dev/provision') {
                     echo 'INFO: Starting Terraform provisioning workflow...'
@@ -96,7 +92,7 @@ pipeline {
                             terraform plan
 
                             echo "INFO: Applying Terraform changes..."
-                            terraform apply -auto-approve
+                            terraform apply -destroy -auto-approve
                         '''
                     }
 
@@ -105,25 +101,25 @@ pipeline {
             }
         }
 
-        stage('Build Application') {
-            steps {
-                echo 'INFO: Installing Node.js dependencies via npm...'
-                sh 'npm install'
-                echo 'INFO: Building React application using npm script...'
-                sh 'npm run build'
-                echo 'INFO: React application build process completed.'
-            }
-        }
+        // stage('Build Application') {
+        //     steps {
+        //         echo 'INFO: Installing Node.js dependencies via npm...'
+        //         sh 'npm install'
+        //         echo 'INFO: Building React application using npm script...'
+        //         sh 'npm run build'
+        //         echo 'INFO: React application build process completed.'
+        //     }
+        // }
 
-        stage('Deploy to S3') {
-            steps {
-                echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
-                sh '''
-                    aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete
-                '''
-                echo 'INFO: Static files successfully deployed to S3.'
-            }
-        }
+        // stage('Deploy to S3') {
+        //     steps {
+        //         echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
+        //         sh '''
+        //             aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete
+        //         '''
+        //         echo 'INFO: Static files successfully deployed to S3.'
+        //     }
+        // }
     }
 
     post {
