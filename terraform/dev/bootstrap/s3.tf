@@ -2,6 +2,22 @@ resource "aws_s3_bucket" "state_bucket" {
   bucket = var.state_bucket_name
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "state_bucket_lifecycle_config" {
+  bucket = aws_s3_bucket.state_bucket.id
+
+  rule {
+    id     = "move-to-intelligent-tiering"
+    status = "Enabled"
+    transition {
+      days          = 0
+      storage_class = "INTELLIGENT_TIERING"
+    }
+    filter {
+      prefix = ""
+    }
+  }
+}
+
 resource "aws_s3_bucket_versioning" "state_bucket_versioning" {
   bucket = aws_s3_bucket.state_bucket.id
 
