@@ -19,7 +19,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "state_bucket_lifecycle_config"
 }
 
 resource "aws_s3_bucket_policy" "deny_state_file_deletion" {
-  bucket = aws_s3_bucket.state_bucket.id
+  bucket = data.state_bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
