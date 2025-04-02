@@ -80,9 +80,9 @@ pipeline {
 
 
         stage('Terraform Provision') {
-            when {
-                changeset '**/terraform/dev/provision/**'
-            }
+            // when {
+            //     changeset '**/terraform/dev/provision/**'
+            // }
             steps {
                 dir('terraform/dev/provision') {
                     echo 'INFO: Starting Terraform provisioning workflow...'
@@ -101,7 +101,7 @@ pipeline {
                             terraform plan -input=false -out=tfplan
 
                             echo "INFO: Applying Terraform changes..."
-                            terraform apply -auto-approve tfplan
+                            terraform apply -destroy -auto-approve tfplan
                         '''
                     }
 
