@@ -3,7 +3,7 @@ data "aws_s3_bucket" "state_bucket" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "state_bucket_lifecycle_config" {
-  bucket = data.state_bucket.id
+  bucket = data.aws_s3_bucket.state_bucket.id
 
   rule {
     id     = "move-to-intelligent-tiering"
