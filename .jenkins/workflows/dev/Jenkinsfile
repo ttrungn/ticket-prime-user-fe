@@ -11,11 +11,11 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('TP_FE_AWS_SECRET_KEY')
 
         // Terraform variables as environment variables
-        TF_VAR_state_bucket_name     = credentials('TP_FE_TF_STATE_BUCKET')
-        TF_VAR_aws_region            = credentials('TP_FE_AWS_REGION_DEV')
+        TF_VAR_state_bucket_name     = credentials('TP_AWS_TF_STATE_BUCKET')
+        TF_VAR_aws_region            = credentials('TP_AWS_REGION_SINGAPORE')
         TF_VAR_cloudfront_acm_region = credentials('TP_FE_AWS_CLOUDFRONT_ACM_REGION')
         TF_VAR_domain_name           = credentials('TP_FE_AWS_DOMAIN_NAME_DEV')
-        TF_VAR_hosted_zone_id        = credentials('TP_FE_AWS_HOSTED_ZONE_ID')
+        TF_VAR_hosted_zone_id        = credentials('TP_AWS_HOSTED_ZONE_ID')
         TF_VAR_bucket_name           = credentials('TP_FE_AWS_S3_BUCKET_DEV')
     }
 
@@ -29,55 +29,27 @@ pipeline {
             }
         }
 
-        stage('Terraform Bootstrap') {
-            when {
-                changeset '**/terraform/dev/**'
-            }
+        stage('Run Bootstrap Pipeline') {
             steps {
-                dir('terraform/dev/bootstrap') {
-                    echo 'INFO: Starting Terraform bootstrap process...'
-
-                    sh '''
-                        set -e
-                        echo "INFO: Checking if S3 bucket '$TF_VAR_state_bucket_name' exists..."
-
-                        if aws s3api head-bucket --bucket "$TF_VAR_state_bucket_name" 2>/dev/null; then
-                            echo "INFO: S3 bucket exists. Importing resources into Terraform state."
-
-                            terraform init -input=false
-
-                            terraform import aws_s3_bucket.state_bucket "$TF_VAR_state_bucket_name" || {
-                                echo "WARNING: Bucket may already be imported or import failed."
-                            }
-
-                            terraform import aws_s3_bucket_versioning.state_bucket_versioning \
-                                "$TF_VAR_state_bucket_name" || true
-
-                            terraform import aws_s3_bucket_public_access_block.state_bucket_block \
-                                "$TF_VAR_state_bucket_name" || true
-
-                            echo "INFO: Terraform resource import complete. Skipping creation step."
-                        else
-                            echo "INFO: S3 bucket does not exist. Proceeding to create it via Terraform."
-                            terraform init -input=false
-                            terraform apply -auto-approve
-                        fi
-                    '''
-
-                    echo 'INFO: Terraform bootstrap stage completed.'
-                }
+                build(
+                    job: 'ticket-prime-common-state_bucket',
+                    parameters: [
+                        string(name: 'current_branch', value: 'main')
+                    ],
+                    wait: true,
+                    propagate: true
+                )
             }
         }
 
         stage('Terraform Provision') {
             when {
-                changeset '**/terraform/dev/**'
+                changeset '**/terraform/dev/provision/**'
             }
             steps {
                 dir('terraform/dev/provision') {
                     echo 'INFO: Starting Terraform provisioning workflow...'
 
-                    /* groovylint-disable-next-line NestedBlockDepth */
                     withEnv(["TF_STATE_KEY=${TF_VAR_bucket_name}/terraform.tfstate"]) {
                         sh '''
                             echo "INFO: Initializing Terraform backend..."
@@ -88,10 +60,10 @@ pipeline {
                                 -backend-config="encrypt=true"
 
                             echo "INFO: Running Terraform plan..."
-                            terraform plan
+                            terraform plan -input=false -out=tfplan
 
                             echo "INFO: Applying Terraform changes..."
-                            terraform apply -auto-approve
+                            terraform apply -auto-approve tfplan
                         '''
                     }
 
