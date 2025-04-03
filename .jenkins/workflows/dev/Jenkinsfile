@@ -34,7 +34,7 @@ pipeline {
                 build(
                     job: 'ticket-prime-common-state_bucket',
                     parameters: [
-                        string(name: 'current_branch', value: 'main')
+                        string(name: 'current_branch', value: 'dev')
                     ],
                     wait: true,
                     propagate: true
