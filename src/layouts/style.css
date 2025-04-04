@@ -1,0 +1,11 @@
+:root {
+  --color-text: #888888;
+}
+
+.menu-item {
+}
+
+.menu-item.menu-item-right {
+  font-size: 1rem;
+  color: var(--color-text);
+}
