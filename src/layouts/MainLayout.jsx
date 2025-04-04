@@ -81,6 +81,7 @@ const MainLayout = ({ children }) => {
                 items={menuItems}
                 style={{ fontSize: '1rem', flexWrap: 'nowrap' }}
                 defaultSelectedKeys={['1']}
+                overflowedIndicator={false}
               />
             ) : (
               // Mobile: Hamburger Button and Drawer Menu
