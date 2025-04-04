@@ -74,7 +74,7 @@ const MainLayout = ({ children }) => {
                 marginRight: '16px',
               }}
             />
-            {screens.md ? (
+            {screens.lg ? (
               // Desktop: Horizontal Menu
               <Menu
                 mode="horizontal"
@@ -98,7 +98,7 @@ const MainLayout = ({ children }) => {
           </div>
           <div>
             <Link to={isLoggedIn ? "/profile" : "/login"} className="menu-item menu-item-right">
-                {screens.md ? (isLoggedIn ? <UserOutlined style={{ marginRight: '8px' }} /> : "Login / Register") : <UserOutlined style={{ marginRight: '8px' }} />}
+                {screens.lg ? (isLoggedIn ? <UserOutlined style={{ marginRight: '8px' }} /> : "Login / Register") : <UserOutlined style={{ marginRight: '8px' }} />}
             </Link>
           </div>
         </div>
