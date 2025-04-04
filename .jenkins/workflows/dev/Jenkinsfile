@@ -22,9 +22,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'INFO: Starting source code checkout from Git repository (dev branch)...'
+                echo 'INFO: Starting source code checkout from Git repository (feature/building-layout branch)...'
                 git url: 'https://github.com/ttrungn/ticket-prime-user-fe.git',
-                    branch: 'dev'
+                    branch: 'feature/building-layout'
                 echo 'INFO: Git checkout completed successfully.'
             }
         }
