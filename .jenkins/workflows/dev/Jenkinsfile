@@ -3,14 +3,12 @@ pipeline {
 
     tools {
         git 'Default'
-        nodejs 'Default'
     }
 
     environment {
         // AWS credentials injected from Jenkins credentials store
         AWS_ACCESS_KEY_ID     = credentials('TP_FE_AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('TP_FE_AWS_SECRET_KEY')
-        AWS_DEFAULT_REGION    = credentials('TP_AWS_REGION_SINGAPORE')
 
         // Terraform variables as environment variables
         TF_VAR_state_bucket_name     = credentials('TP_AWS_TF_STATE_BUCKET')
@@ -87,30 +85,10 @@ pipeline {
 
         stage('Deploy to S3') {
             steps {
-                echo "INFO: Starting deployment to S3 bucket: ${env.TF_VAR_bucket_name}..."
-
-                withAWS(
-                    credentials: 'TP_FE_AWS_CREDENTIALS',
-                    region: "${env.AWS_DEFAULT_REGION}"
-                ) {
-                    s3Upload(
-                        entries: [
-                            [
-                                bucket: "${env.TF_VAR_bucket_name}",
-                                workingDir: 'dist',
-                                includePathPattern: '**/*',
-                                path: '',
-                                profileName: '', // Provide a named profile if needed, or leave empty
-                                userMetadata: '', // Specify any metadata if required, or leave empty
-                                dontWaitForConcurrentBuildCompletion: false, // Wait for concurrent builds by default
-                                consoleLogLevel: 'INFO', // Set the console log level
-                                pluginFailureResultConstraint: 'FAILURE', // Set desired build result on failure
-                                dontSetBuildResultOnFailure: false // Allow the build result to be set on failure
-                            ]
-                        ]
-                    )
-                }
-
+                echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
+                sh '''
+                    aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete
+                '''
                 echo 'INFO: Static files successfully deployed to S3.'
             }
         }
