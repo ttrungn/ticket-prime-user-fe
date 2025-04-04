@@ -87,20 +87,21 @@ pipeline {
 
         stage('Deploy to S3') {
             steps {
-                echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
-
-                withAWS(credentials: 'TP_FE_AWS_ACCESS_KEY_ID', region: "${env.AWS_DEFAULT_REGION}") {
-                    s3Upload(
-                        bucket: "${env.TF_VAR_bucket_name}",
-                        workingDir: 'dist',
-                        includePathPattern: '**/*',
-                        path: ''
-                    )
+                echo "INFO: Starting deployment to S3 bucket: ${env.TF_VAR_bucket_name}..."
+                withAWS(credentials: 'TP_FE_AWS_CREDENTIALS', region: "${env.AWS_DEFAULT_REGION}") {
+                    s3Upload entries: [
+                        [
+                            bucket: "${env.TF_VAR_bucket_name}",
+                            workingDir: 'dist',
+                            includePathPattern: '**/*',
+                            path: ''
+                        ]
+                    ]
                 }
-
                 echo 'INFO: Static files successfully deployed to S3.'
             }
         }
+
     }
 
     post {
