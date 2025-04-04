@@ -1,9 +1,12 @@
-import React from 'react';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import React, { useState } from 'react';
+import { Breadcrumb, Layout, Menu, theme, Drawer, Button, Grid } from 'antd';
 import { Link } from 'react-router-dom';
+import { MenuOutlined, UserOutlined } from '@ant-design/icons';
 import './style.css';
 
 const { Header, Content, Footer } = Layout;
+const { useBreakpoint } = Grid;
+
 const isLoggedIn = false;
 const menuItems = [
   {
@@ -38,6 +41,11 @@ const MainLayout = ({ children }) => {
   const {
     token: { colorBgContainer, borderRadiusLG, colorPrimary, colorText },
   } = theme.useToken();
+  const screens = useBreakpoint();
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const showDrawer = () => setDrawerVisible(true);
+  const onClose = () => setDrawerVisible(false);
+
   return (
     <Layout>
       <Header
@@ -66,27 +74,37 @@ const MainLayout = ({ children }) => {
                 marginRight: '16px',
               }}
             />
-            <Menu
-              mode="horizontal"
-              items={menuItems}
-              style={{ fontSize: '1rem', flexWrap: 'nowrap' }}
-              defaultSelectedKeys={['1']}
-            />
+            {screens.md ? (
+              // Desktop: Horizontal Menu
+              <Menu
+                mode="horizontal"
+                items={menuItems}
+                style={{ fontSize: '1rem', flexWrap: 'nowrap' }}
+                defaultSelectedKeys={['1']}
+              />
+            ) : (
+              // Mobile: Hamburger Button and Drawer Menu
+              <>
+                <Button icon={<MenuOutlined />} onClick={showDrawer} />
+                <Drawer width="100%" placement="left" onClose={onClose} open={drawerVisible}>
+                  <Menu
+                    mode="vertical"
+                    items={menuItems}
+                    defaultSelectedKeys={['1']}
+                  />
+                </Drawer>
+              </>
+            )}
           </div>
           <div>
-            {isLoggedIn ? (
-              <Link to="/profile" className="menu-item menu-item-right">
-                Profile
-              </Link>
-            ) : (
-              <Link to="/login" className="menu-item menu-item-right">
-                Login / Register
-              </Link>
-            )}
+            <Link to={isLoggedIn ? "/profile" : "/login"} className="menu-item menu-item-right">
+                {screens.md ? (isLoggedIn ? <UserOutlined style={{ marginRight: '8px' }} /> : "Login / Register") : <UserOutlined style={{ marginRight: '8px' }} />}
+            </Link>
           </div>
         </div>
       </Header>
       <Content style={{ padding: '0 48px' }}>
+        {/* Uncomment and customize Breadcrumb if needed */}
         {/* <Breadcrumb style={{ margin: '16px 0' }}>
           <Breadcrumb.Item>Home</Breadcrumb.Item>
           <Breadcrumb.Item>List</Breadcrumb.Item>
@@ -105,8 +123,7 @@ const MainLayout = ({ children }) => {
       </Content>
       <Footer style={{ textAlign: 'center' }}>
         © {new Date().getFullYear()}{' '}
-        <span style={{ fontWeight: 'bold' }}>Ticket Prime</span>. All rights
-        reserved.
+        <span style={{ fontWeight: 'bold' }}>Ticket Prime</span>. All rights reserved.
       </Footer>
     </Layout>
   );
