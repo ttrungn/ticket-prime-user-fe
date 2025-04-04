@@ -3,6 +3,7 @@ pipeline {
 
     tools {
         git 'Default'
+        nodejs "Default"
     }
 
     environment {
