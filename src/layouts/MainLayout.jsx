@@ -64,7 +64,7 @@ const MainLayout = ({ children }) => {
             width: '100%',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center'}}>
             <div
               className="demo-logo"
               style={{
@@ -81,7 +81,6 @@ const MainLayout = ({ children }) => {
                 items={menuItems}
                 style={{ fontSize: '1rem', flexWrap: 'nowrap' }}
                 defaultSelectedKeys={['1']}
-                overflowedIndicator={true}
               />
             ) : (
               // Mobile: Hamburger Button and Drawer Menu
