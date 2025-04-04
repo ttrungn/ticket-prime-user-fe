@@ -34,7 +34,8 @@ pipeline {
                 build(
                     job: 'ticket-prime-common-state_bucket',
                     parameters: [
-                        string(name: 'current_branch', value: 'dev')
+                        // Always try to use the main branch
+                        string(name: 'current_branch', value: 'main')
                     ],
                     wait: true,
                     propagate: true
@@ -86,7 +87,7 @@ pipeline {
             steps {
                 echo "INFO: Starting deployment to S3 bucket: $TF_VAR_bucket_name..."
                 sh '''
-                    aws s3 sync ./build/ s3://$TF_VAR_bucket_name/ --delete
+                    aws s3 sync ./dist/ s3://$TF_VAR_bucket_name/ --delete
                 '''
                 echo 'INFO: Static files successfully deployed to S3.'
             }
