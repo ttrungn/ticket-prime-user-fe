@@ -1,0 +1,42 @@
+:root {
+}
+
+.menu-item {
+  font-size: 1rem;
+  color: #888888;
+}
+
+.header {
+  background-color: #ffffff;
+  padding: 16px 48px;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 16px;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  max-width: 75%;
+}
+
+.navbar-right .menu-item {
+  color: #000000;
+}
+
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: #ffffff;
+  background-color: #000000;
+  margin-top: 24px;
+}
