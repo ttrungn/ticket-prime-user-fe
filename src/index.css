@@ -1,0 +1,122 @@
+Reset some browser defaults * {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+}
+
+/* Default styles for html and body */
+html {
+  line-height: 1.5;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #888888;
+  background-color: #ffffff;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 2.25rem;
+}
+h2 {
+  font-size: 1.875rem;
+}
+h3 {
+  font-size: 1.5rem;
+}
+h4 {
+  font-size: 1.25rem;
+}
+h5 {
+  font-size: 1rem;
+}
+h6 {
+  font-size: 0.875rem;
+}
+
+/* Paragraphs */
+p {
+  margin-bottom: 1em;
+}
+
+/* Links */
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+}
+
+a:active {
+  text-decoration: none;
+}
+
+/* Lists */
+ul,
+ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+li {
+  margin-bottom: 0.25em;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Buttons */
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Forms */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Other semantic tags */
+article,
+aside,
+footer,
+header,
+nav,
+section,
+main {
+  display: block;
+}
