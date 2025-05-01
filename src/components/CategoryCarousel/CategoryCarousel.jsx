@@ -2,6 +2,8 @@ import { CaretLeftOutlined, CaretRightOutlined } from '@ant-design/icons';
 import { Button, Card, Grid } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
+import './styles.css';
+
 const { useBreakpoint } = Grid;
 
 const CategoryCarousel = ({ category, items }) => {
@@ -42,7 +44,7 @@ const CategoryCarousel = ({ category, items }) => {
   };
 
   return (
-    <div>
+    <div className="mb-3">
       <h1>{category}</h1>
       <div className="category-slider relative overflow-hidden">
         <div className="absolute top-1/2 left-0 z-10 transform -translate-y-1/2">
@@ -59,7 +61,7 @@ const CategoryCarousel = ({ category, items }) => {
           {items.map((card, index) => (
             <Card key={index} style={{ width: cardWidth, flex: '0 0 auto' }}>
               <div className="mb-3">
-                <img src={card.imageUrl} alt={card.title} className="w-full object-cover" />
+                <img src={card.imageUrl} alt={card.title} className="w-full h-full object-cover aspect-[2/1]" />
               </div>
               <p>{card.subCategory}</p>
               <h4>{card.title}</h4>

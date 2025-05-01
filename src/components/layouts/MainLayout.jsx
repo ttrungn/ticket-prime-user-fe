@@ -1,4 +1,4 @@
-import { Breadcrumb, Layout } from 'antd';
+import { Layout } from 'antd';
 
 import Header from './Header';
 import Footer from './Footer';
@@ -9,19 +9,11 @@ const { Content } = Layout;
 
 const MainLayout = ({ children }) => {
   return (
-    <Layout style={{ backgroundColor: '#ffffff' }}>
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <Content className="lg:container lg:mx-auto px-8 lg:py-8 mt-7">
-        {/* Uncomment and customize Breadcrumb if needed */}
-        {/* <Breadcrumb style={{ margin: '16px 0' }}>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>List</Breadcrumb.Item>
-          <Breadcrumb.Item>App</Breadcrumb.Item>
-        </Breadcrumb> */}
-        {children}
-      </Content>
+      <Content className="lg:container lg:mx-auto px-8 lg:py-8 mt-7 relative">{children}</Content>
       <Footer />
-    </Layout>
+    </div>
   );
 };
 

@@ -1,29 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  categories: [
-    'Concerts',
-    'Sports',
-    'Arts, Theater & Comedy',
-    'Family',
-    'Festivals',
-    'Film',
-    'Dance',
-    'Gaming',
-    'Esports',
-    'Food & Drink',
-    'Comedy',
-    'Theater',
-    'Classical',
-    'Jazz',
-    'Rock',
-    'Pop',
-    'Hip-Hop/Rap',
-    'Electronic',
-    'Country',
-    'Folk',
-    'R&B',
-  ],
+  categories: ['Concerts', 'Sports', 'Arts, Theater & Comedy', 'Family', 'Festivals', 'Film', 'Dance', 'Gaming'],
   selectedCategory: null,
 };
 

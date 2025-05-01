@@ -1,10 +1,10 @@
-import { Button, Card, Space } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import CustomCarousel from '../../components/CustomCarousel/CustomCarousel';
 
 import './styles.css';
 import CategoryCarousel from '../../components/CategoryCarousel/CategoryCarousel';
+import GoogleLoginButton from '../../components/GoogleLoginButton/GoogleLoginButton';
 
 const Home = () => {
   const sliderRef = useRef(null);

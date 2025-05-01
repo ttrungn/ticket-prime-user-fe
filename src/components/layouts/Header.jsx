@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import React, { useState } from 'react';
 import { Menu, Drawer, Button, Grid } from 'antd';
 import { Link } from 'react-router-dom';
@@ -27,20 +26,24 @@ const Header = () => {
   return (
     <header className="header border-b-1">
       <div className="navbar-container">
-        <div className="navbar-logo">
-          <Link to="/">🎟️</Link>
-        </div>
         <div className="navbar-left">
-          {screens.lg ? (
-            <Menu style={{ borderBottom: 'none' }} mode="horizontal" items={menuItemsLeft} disabledOverflow />
-          ) : (
-            <>
-              <Button icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
-              <Drawer width="100%" placement="left" onClose={() => setDrawerVisible(false)} open={drawerVisible}>
-                <Menu mode="vertical" items={menuItemsLeft} defaultSelectedKeys={['1']} />
-              </Drawer>
-            </>
-          )}
+          <div className="navbar-logo">
+            <Link to="/">
+              <img src="/logo.png" alt="" className="w-[50px] h-[50px]" />
+            </Link>
+          </div>
+          <div className="navbar-categories">
+            {screens.lg ? (
+              <Menu style={{ borderBottom: 'none' }} mode="horizontal" items={menuItemsLeft} disabledOverflow />
+            ) : (
+              <>
+                <Button icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
+                <Drawer width="100%" placement="left" onClose={() => setDrawerVisible(false)} open={drawerVisible}>
+                  <Menu mode="vertical" items={menuItemsLeft} defaultSelectedKeys={['1']} />
+                </Drawer>
+              </>
+            )}
+          </div>
         </div>
         <div className="navbar-right">
           <Link to={isLoggedIn ? '/profile' : '/login'} className="menu-item">
