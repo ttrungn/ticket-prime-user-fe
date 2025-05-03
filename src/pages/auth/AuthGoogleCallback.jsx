@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { signInUserWithGoogle } from '../../api/auth';
 
 import './styles.css';
 import LoadingContainer from '../../components/LoadingContainer/LoadingContainer';
+import { loginWithGoogle } from '../../features/authSlice';
+import { useDispatch } from 'react-redux';
 
 const AuthGoogleCallback = ({ role }) => {
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
   const { search } = useLocation();
 
@@ -19,22 +22,26 @@ const AuthGoogleCallback = ({ role }) => {
       return;
     }
 
-    signInUserWithGoogle(role, code)
-      .then(res => {
-        if (res.status === 200) {
-          localStorage.setItem('AT', res.data.accessToken);
-          localStorage.setItem('AT_EX', res.data.expiresIn);
-          navigate('/', { replace: true });
-        }
-      })
+    // Prevent duplicate execution
+    if (sessionStorage.getItem('google_signin_handled')) return;
+
+    sessionStorage.setItem('google_signin_handled', 'true');
+    console.log('trying to sign in...');
+    dispatch(loginWithGoogle({ role, code }))
+      .unwrap()
+      .then(() => navigate('/', { replace: true }))
       .catch(err => {
         navigate('/error', {
           replace: true,
           state: {
-            statusCode: err.response?.status,
-            message: 'Cannot using Google to sign you in right now',
+            statusCode: 401,
+            message: err || 'Google login failed.',
           },
         });
+      })
+      .finally(() => {
+        sessionStorage.removeItem('oauth_state');
+        sessionStorage.removeItem('google_signin_handled');
       });
   }, [search, navigate]);
 

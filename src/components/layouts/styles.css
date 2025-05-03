@@ -7,8 +7,8 @@
 }
 
 .header {
+  padding: 0 16px;
   background-color: #ffffff;
-  padding: 16px 48px;
 }
 
 .navbar-container {

@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GoogleLoginButton from '../GoogleLoginButton/GoogleLoginButton';
-import LoadingContainer from '../LoadingContainer/LoadingContainer'; // assuming path
-import { signInUser } from '../../api/auth';
+import LoadingContainer from '../LoadingContainer/LoadingContainer';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../features/authSlice';
+import RoleSelector from './RoleSelector';
+import InputField from '../InputField/InputField';
 
 const AuthForm = ({ isLogin }) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [isRoleChoosen, setIsRoleChoosen] = useState(false);
   const [role, setRole] = useState('');
   const [email, setEmail] = useState('');
   const [isEmailTouched, setIsEmailTouched] = useState(false);
   const [password, setPassword] = useState('');
   const [isPasswordTouched, setIsPasswordTouched] = useState(false);
+
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector(state => state.auth);
 
   const isEmailValid = /^\S+@\S+\.\S+$/.test(email) && email.length <= 320;
 
@@ -21,92 +26,43 @@ const AuthForm = ({ isLogin }) => {
     setIsRoleChoosen(true);
   };
 
-  const handleSubmit = event => {
-    event.preventDefault();
-    if (!isEmailValid || password.length === 0) return;
-
-    setLoading(true);
-    signInUser(email, password, role)
-      .then(res => {
-        if (res.status === 200) {
-          localStorage.setItem('AT', res.data.accessToken);
-          localStorage.setItem('AT_EX', res.data.expiresIn);
-          navigate('/', { replace: true });
-        }
-      })
-      .catch(err => {
-        navigate('/error', {
-          replace: true,
-          state: {
-            statusCode: err.response?.status,
-            message: 'Cannot sign you in right now',
-          },
-        });
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  const handleSubmit = e => {
+    e.preventDefault();
+    dispatch(login({ email, password, role }))
+      .unwrap()
+      .then(() => navigate('/', { replace: true }))
+      .catch(() => {});
   };
 
   return (
     <form className="p-10 flex flex-col justify-center" onSubmit={handleSubmit}>
       {loading && <LoadingContainer content="Signing you in..." />}
-      {!loading && !isRoleChoosen && (
-        <>
-          <h2 className="mb-4 text-lg font-semibold text-center">Please choose your role</h2>
-          <div className="flex flex-col gap-4">
-            <button
-              type="button"
-              onClick={() => handleRoleChange('customer')}
-              className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors duration-200 font-semibold"
-            >
-              Customer
-            </button>
-            <button
-              type="button"
-              onClick={() => handleRoleChange('organizer')}
-              className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors duration-200 font-semibold"
-            >
-              Organizer
-            </button>
-          </div>
-        </>
-      )}
-
+      {!loading && !isRoleChoosen && <RoleSelector onSelect={handleRoleChange} />}
       {!loading && isRoleChoosen && (
         <>
           <p className="mb-4 text-sm text-gray-600">If you don’t have an account you will be prompted to create one.</p>
 
-          <label className="text-sm font-medium mb-1">Email Address</label>
-          <input
+          <InputField
+            label="Email Address"
             type="email"
-            disabled={loading}
-            className={`border rounded px-4 py-2 mb-2 ${isEmailTouched && !isEmailValid ? 'border-red-500' : ''}`}
+            value={email}
             onChange={e => setEmail(e.target.value)}
             onBlur={() => setIsEmailTouched(true)}
+            error={isEmailTouched && !isEmailValid ? 'Please enter a valid email address.' : ''}
           />
-          <p className={`text-sm ${isEmailTouched && !isEmailValid ? 'text-red-500' : 'text-white'} mb-4`}>
-            Please enter a valid email address.
-          </p>
 
-          <label className="text-sm font-medium mb-1">Password</label>
-          <input
+          <InputField
+            label="Password"
             type="password"
-            disabled={loading}
-            className={`border rounded px-4 py-2 mb-2 ${
-              isPasswordTouched && password.length === 0 ? 'border-red-500' : ''
-            }`}
+            value={password}
             onChange={e => setPassword(e.target.value)}
             onBlur={() => setIsPasswordTouched(true)}
+            error={isPasswordTouched && password.length === 0 ? 'Please enter your password.' : ''}
           />
-          <p className={`text-sm ${isPasswordTouched && password.length === 0 ? 'text-red-500' : 'text-white'} mb-4`}>
-            Please enter your password.
-          </p>
 
           <button
             type="submit"
-            disabled={loading}
-            className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors duration-200 font-semibold"
+            className="bg-black mb-6 text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors duration-200 font-semibold"
           >
             Sign In
           </button>
@@ -114,7 +70,6 @@ const AuthForm = ({ isLogin }) => {
           <GoogleLoginButton role={role} buttonType="button" />
         </>
       )}
-
       <p className="text-xs text-gray-500 mt-4 text-center">
         By continuing, you agree to the{' '}
         <a href="#" className="text-blue-600 underline">

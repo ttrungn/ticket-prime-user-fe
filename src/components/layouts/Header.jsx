@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { Menu, Drawer, Button, Grid } from 'antd';
 import { Link } from 'react-router-dom';
-import { MenuOutlined, UserOutlined } from '@ant-design/icons';
+import { MenuOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 
 import './styles.css';
+import UserDropdown from '../UserDropdown/UserDropdown';
 
 const { useBreakpoint } = Grid;
-const isLoggedIn = false;
 
 const Header = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
+
+  const { user } = useSelector(state => state.auth);
 
   const screens = useBreakpoint();
   const categories = useSelector(state => state.category.categories);
@@ -29,7 +31,7 @@ const Header = () => {
         <div className="navbar-left">
           <div className="navbar-logo">
             <Link to="/">
-              <img src="/logo.png" alt="" className="w-[50px] h-[50px]" />
+              <img src="/logo.png" alt="" className="w-[100px] h-[100px]" />
             </Link>
           </div>
           <div className="navbar-categories">
@@ -46,8 +48,8 @@ const Header = () => {
           </div>
         </div>
         <div className="navbar-right">
-          <Link to={isLoggedIn ? '/profile' : '/login'} className="menu-item">
-            {screens.lg ? isLoggedIn ? <UserOutlined /> : 'Login / Register' : <UserOutlined />}
+          <Link to={user ? '/profile' : '/login'} className="menu-item">
+            {screens.lg ? user ? <UserDropdown /> : 'Login / Register' : <UserDropdown />}
           </Link>
         </div>
       </div>
