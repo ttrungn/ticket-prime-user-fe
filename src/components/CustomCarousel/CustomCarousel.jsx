@@ -13,7 +13,7 @@ const contentStyle = {
 
 function CustomCarousel() {
   return (
-    <Carousel autoplay={{ dotDuration: true }} autoplaySpeed={3000} arrows infinite={true}>
+    <Carousel className="mb-4" autoplay={{ dotDuration: true }} autoplaySpeed={3000} arrows infinite={true}>
       <div>
         <h3 style={contentStyle}>1</h3>
       </div>

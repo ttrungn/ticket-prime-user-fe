@@ -8,7 +8,7 @@ export const login = createAsyncThunk('auth/login', async ({ email, password, ro
     const res = await signInUser(email, password, role);
     return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue('Failed to sign you in.');
+    return thunkAPI.rejectWithValue(err.response?.data || 'Failed to sign you in.');
   }
 });
 

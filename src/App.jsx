@@ -1,20 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
 
 import MainLayout from './components/layouts/MainLayout';
+import LoadingContainer from './components/LoadingContainer/LoadingContainer';
+
 import Home from './pages/home/Home';
 import About from './pages/about/About';
 import Contact from './pages/contact/Contact';
 import Auth from './pages/auth/Auth';
 import AuthGoogleCallback from './pages/auth/AuthGoogleCallback';
+import Organizers from './pages/organizers/Organizers';
 import Error from './exceptions/Error';
-import ProtectedRoute from './routes/protectedRoute';
 
-import './App.css';
-import LoadingContainer from './components/LoadingContainer/LoadingContainer';
 import { loadInitialData } from './store/loadInitialData';
+import './App.css';
 
 function App() {
   const dispatch = useDispatch();
@@ -25,19 +25,24 @@ function App() {
     setIsInitializing(false);
   }, [dispatch]);
 
-  if (isInitializing) return <LoadingContainer content={'Loading'} />;
+  if (isInitializing) return <LoadingContainer content="Loading..." />;
 
   return (
     <Router>
       <Routes>
         <Route element={<MainLayout />}>
+          {/* Common routes */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Auth isLogin={true} />} />
           <Route path="/register" element={<Auth isLogin={false} />} />
-          <Route path="/auth/google/customer/callback" element={<AuthGoogleCallback role="customer" />} />
-          <Route path="/auth/google/organizer/callback" element={<AuthGoogleCallback role="organizer" />} />
+          <Route path="/auth/google/:role/callback" element={<AuthGoogleCallback />} />
+
+          {/* Category-based organizers routes */}
+          <Route path="/category/:categorySlug" element={<Organizers />} />
+
+          {/* Error pages */}
           <Route path="/error" element={<Error />} />
           <Route path="*" element={<Error statusCode={404} message="Page not found" />} />
         </Route>

@@ -3,12 +3,11 @@
 
 .menu-item {
   font-size: 1rem;
-  color: #888888;
+  color: #ffffff !important;
 }
 
 .header {
   padding: 0 16px;
-  background-color: #ffffff;
 }
 
 .navbar-container {
@@ -29,8 +28,18 @@
   max-width: 75%;
 }
 
-.navbar-right .menu-item {
-  color: #000000;
+.ant-menu.ant-menu-root.ant-menu-horizontal {
+  background-color: #000000 !important;
+}
+
+.ant-menu-item-selected::after {
+  border-bottom-width: 2px !important;
+  border-bottom-color: #ffffff !important;
+}
+
+.ant-menu-item:hover::after {
+  border-bottom-width: 2px !important;
+  border-bottom-color: #ffffff !important;
 }
 
 .footer {

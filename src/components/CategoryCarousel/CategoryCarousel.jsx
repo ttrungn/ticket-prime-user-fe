@@ -44,7 +44,7 @@ const CategoryCarousel = ({ category, items }) => {
   };
 
   return (
-    <div className="mb-3">
+    <div className="mb-4">
       <h1>{category}</h1>
       <div className="category-slider relative overflow-hidden">
         <div className="absolute top-1/2 left-0 z-10 transform -translate-y-1/2">
@@ -59,7 +59,11 @@ const CategoryCarousel = ({ category, items }) => {
         </div>
         <div ref={sliderRef} className="flex gap-x-4 overflow-x-auto scroll-smooth">
           {items.map((card, index) => (
-            <Card key={index} style={{ width: cardWidth, flex: '0 0 auto' }}>
+            <Card
+              key={index}
+              className="hover:opacity-80 cursor-pointer"
+              style={{ width: cardWidth, flex: '0 0 auto' }}
+            >
               <div className="mb-3">
                 <img src={card.imageUrl} alt={card.title} className="w-full h-full object-cover aspect-[2/1]" />
               </div>

@@ -1,4 +1,3 @@
-import { jwtDecode } from 'jwt-decode';
 import { logout, setCredentials } from '../features/authSlice';
 
 export const loadInitialData = () => async dispatch => {
@@ -12,7 +11,9 @@ export const loadInitialData = () => async dispatch => {
   }
 
   try {
-    await Promise.all([]);
+    await Promise.all([
+      // dispatch(fetchCategories())
+    ]);
   } catch (err) {
     console.error('Error loading initial data:', err);
   }

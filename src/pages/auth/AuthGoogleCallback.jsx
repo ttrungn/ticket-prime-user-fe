@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 import './styles.css';
 import LoadingContainer from '../../components/LoadingContainer/LoadingContainer';
 import { loginWithGoogle } from '../../features/authSlice';
 import { useDispatch } from 'react-redux';
 
-const AuthGoogleCallback = ({ role }) => {
+const AuthGoogleCallback = () => {
+  const { role } = useParams();
+
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
