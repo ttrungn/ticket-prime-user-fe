@@ -13,18 +13,33 @@ const contentStyle = {
 
 function CustomCarousel() {
   return (
-    <Carousel className="mb-4" autoplay={{ dotDuration: true }} autoplaySpeed={3000} arrows infinite={true}>
+    <Carousel
+      className="mb-4"
+      autoplay={{ dotDuration: true }}
+      autoplaySpeed={3000}
+      arrows
+      infinite={true}
+      effect="fade"
+    >
       <div>
-        <h3 style={contentStyle}>1</h3>
+        <h3 className="rounded-xl" style={contentStyle}>
+          1
+        </h3>
       </div>
       <div>
-        <h3 style={contentStyle}>2</h3>
+        <h3 className="rounded-xl" style={contentStyle}>
+          2
+        </h3>
       </div>
       <div>
-        <h3 style={contentStyle}>3</h3>
+        <h3 className="rounded-xl" style={contentStyle}>
+          3
+        </h3>
       </div>
       <div>
-        <h3 style={contentStyle}>4</h3>
+        <h3 className="rounded-xl" style={contentStyle}>
+          4
+        </h3>
       </div>
     </Carousel>
   );

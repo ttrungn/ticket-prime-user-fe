@@ -1,0 +1,6 @@
+.header {
+  background-image: url('/defaultCategoryBackground.png');
+  background-size: 100vw; /* Stretch the background to full width */
+  background-position: center;
+  background-repeat: no-repeat;
+}

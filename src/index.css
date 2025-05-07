@@ -1,7 +1,4 @@
-Reset some browser defaults * {
-  margin: 0;
-  padding: 0;
-  border: 0;
+* {
   box-sizing: border-box;
 }
 
@@ -16,6 +13,7 @@ body {
   padding: 0;
   color: #888888;
   background-color: #ffffff;
+  font-family: 'Times New Roman', Times, serif !important;
 }
 
 /* Headings */
@@ -26,8 +24,6 @@ h4,
 h5,
 h6 {
   font-weight: 600;
-  line-height: 1.25;
-  margin-bottom: 0.5em;
 }
 
 h1 {

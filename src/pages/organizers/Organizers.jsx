@@ -1,9 +1,12 @@
-import { Breadcrumb } from 'antd';
 import { useEffect, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { toSlug } from '../../utils/stringConverter';
 import OrganizerCardList from '../../components/OrganizerCardList/OrganizerCardList';
 import { useSelector } from 'react-redux';
+
+import organizersStyles from './styles.module.css';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
+import Dropdown from '../../components/Dropdown/Dropdown';
 
 const Organizers = () => {
   const { categories } = useSelector(state => state.category);
@@ -31,33 +34,45 @@ const Organizers = () => {
     }
   }, [categorySlug, subcategorySlug, categories]);
 
-  const breadcrumbItems = [
-    { title: <Link to="/">Home</Link> },
-    category && {
-      title: subcategoryName ? <Link to={`/category/${categorySlug}`}>{category.name}</Link> : category.name,
-    },
-    subcategoryName && { title: subcategoryName },
-  ].filter(Boolean);
-
   if (!category) return <div>Category or subcategory not found.</div>;
 
+  const breadcrumbItems = [
+    {
+      title: 'Home',
+      link: '/',
+    },
+    {
+      title: category.name,
+      link: `/category/${toSlug(category.name)}`,
+    },
+    subcategoryName && {
+      title: subcategoryName,
+    },
+  ].filter(Boolean);
+  console.log(category.subcategories);
   const displayTitle = subcategoryName || category.name;
 
   return (
-    <div>
-      <Breadcrumb items={breadcrumbItems} />
-
-      <h1>{displayTitle}</h1>
-
-      <div style={{ margin: '16px 0' }}>
-        <div>Subcategory choosing dropdown</div>
+    <>
+      <div
+        className={`bg-[url('/defaultCategoryBackground.png')] bg-no-repeat bg-center bg-[length:100vw] p-8 rounded-xl min-h-[250px] relative mb-4`}
+      >
+        <Breadcrumb items={breadcrumbItems} />
+        <h1 className="text-white">{displayTitle} Tickets</h1>
       </div>
-
+      <Dropdown
+        className={'mb-4'}
+        buttonLabel={`All ${category.name}`}
+        menuItems={category.subcategories.map((sub, index) => ({
+          label: sub,
+          link: `/category/${toSlug(category.name)}/?subcategorySlug=${toSlug(sub)}`,
+        }))}
+      />
       <div>
         <p>Total events: 42</p>
         <OrganizerCardList />
       </div>
-    </div>
+    </>
   );
 };
 

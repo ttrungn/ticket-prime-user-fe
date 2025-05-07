@@ -20,7 +20,7 @@ const Home = () => {
     ]);
   }, []);
   return (
-    <>
+    <div>
       <CustomCarousel />
       <div>
         <div className="categories-slider relative" ref={sliderRef}>
@@ -29,7 +29,7 @@ const Home = () => {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

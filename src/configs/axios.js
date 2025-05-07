@@ -26,8 +26,8 @@ api.interceptors.response.use(
     return response;
   },
   error => {
-    if (error.response && error.response.status === 401) {
-      console.error('Unauthorized, redirecting to login');
+    const isExcluded = error?.config?.url?.startsWith('/auth/users/login');
+    if (error.response && error.response.status === 401 && !isExcluded) {
       window.location.href = '/login';
     }
     return Promise.reject(error);

@@ -28,7 +28,7 @@
   max-width: 75%;
 }
 
-.ant-menu.ant-menu-root.ant-menu-horizontal {
+.ant-menu.ant-menu-root {
   background-color: #000000 !important;
 }
 
@@ -48,4 +48,8 @@
   color: #ffffff;
   background-color: #000000;
   margin-top: 24px;
+}
+
+.ant-drawer-close {
+  color: white !important;
 }

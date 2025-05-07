@@ -7,7 +7,7 @@ const RoleSelector = ({ onSelect }) => (
           key={role}
           type="button"
           onClick={() => onSelect(role)}
-          className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors duration-200 font-semibold"
+          className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors duration-200 font-semibold cursor-pointer"
         >
           {role.charAt(0).toUpperCase() + role.slice(1)}
         </button>

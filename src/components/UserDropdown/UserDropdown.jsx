@@ -14,7 +14,7 @@ const UserDropdown = () => {
   return (
     <Dropdown menu={{ items }} trigger={['click']}>
       <Space>
-        <UserOutlined onClick={handleLogout} />
+        <UserOutlined style={{ color: '#ffffff' }} onClick={handleLogout} />
       </Space>
     </Dropdown>
   );

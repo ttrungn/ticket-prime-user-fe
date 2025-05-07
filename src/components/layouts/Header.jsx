@@ -66,7 +66,17 @@ const Header = () => {
             ) : (
               <>
                 <Button icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
-                <Drawer width="100%" placement="left" onClose={() => setDrawerVisible(false)} open={drawerVisible}>
+                <Drawer
+                  styles={{
+                    content: {
+                      backgroundColor: '#000', // Set the drawer content background
+                    },
+                  }}
+                  width="100%"
+                  placement="left"
+                  onClose={() => setDrawerVisible(false)}
+                  open={drawerVisible}
+                >
                   <Menu mode="vertical" items={menuItemsLeft} selectedKeys={selectedKeys} />
                 </Drawer>
               </>

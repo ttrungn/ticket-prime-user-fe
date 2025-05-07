@@ -22,7 +22,7 @@ const GoogleLoginButton = ({ buttonType, role }) => {
     <button
       type={buttonType}
       onClick={handleLogin}
-      className="flex justify-center items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-50 transition"
+      className="flex justify-center items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-50 transition cursor-pointer"
     >
       <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
       Google
