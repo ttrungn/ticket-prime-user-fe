@@ -4,7 +4,6 @@ import { toSlug } from '../../utils/stringConverter';
 import OrganizerCardList from '../../components/OrganizerCardList/OrganizerCardList';
 import { useSelector } from 'react-redux';
 
-import organizersStyles from './styles.module.css';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import Dropdown from '../../components/Dropdown/Dropdown';
 
@@ -12,27 +11,27 @@ const Organizers = () => {
   const { categories } = useSelector(state => state.category);
   const { categorySlug } = useParams();
   const [search] = useSearchParams();
-  const subcategorySlug = search.get('subcategorySlug');
+  const subCategorySlug = search.get('subCategorySlug');
 
   const [category, setCategory] = useState(null);
-  const [subcategoryName, setSubcategoryName] = useState(null);
+  const [subCategoryName, setSubCategoryName] = useState(null);
 
   useEffect(() => {
     const matchedCategory = categories.find(cat => {
       const isMatch = toSlug(cat.name) === categorySlug;
-      const hasSub = subcategorySlug ? cat.subcategories.some(sub => toSlug(sub) === subcategorySlug) : true;
+      const hasSub = subCategorySlug ? cat.subCategories.some(sub => toSlug(sub.name) === subCategorySlug) : true;
       return isMatch && hasSub;
     });
 
     setCategory(matchedCategory || null);
 
-    if (matchedCategory && subcategorySlug) {
-      const matchedSub = matchedCategory.subcategories.find(sub => toSlug(sub) === subcategorySlug);
-      setSubcategoryName(matchedSub || null);
+    if (matchedCategory && subCategorySlug) {
+      const matchedSub = matchedCategory.subCategories.find(sub => toSlug(sub.name) === subCategorySlug);
+      setSubCategoryName(matchedSub.name || null);
     } else {
-      setSubcategoryName(null);
+      setSubCategoryName(null);
     }
-  }, [categorySlug, subcategorySlug, categories]);
+  }, [categorySlug, subCategorySlug, categories]);
 
   if (!category) return <div>Category or subcategory not found.</div>;
 
@@ -41,16 +40,25 @@ const Organizers = () => {
       title: 'Home',
       link: '/',
     },
-    {
+    !subCategoryName && {
+      title: category.name,
+    },
+    subCategoryName && {
       title: category.name,
       link: `/category/${toSlug(category.name)}`,
     },
-    subcategoryName && {
-      title: subcategoryName,
+    subCategoryName && {
+      title: subCategoryName,
     },
   ].filter(Boolean);
-  console.log(category.subcategories);
-  const displayTitle = subcategoryName || category.name;
+  const displayTitle = subCategoryName || category.name;
+  const menuItems = [
+    { label: `All ${category.name}`, link: `/category/${toSlug(category.name)}` },
+    ...category.subCategories.map(sub => ({
+      label: sub.name,
+      link: `/category/${toSlug(category.name)}/?subCategorySlug=${toSlug(sub.name)}`,
+    })),
+  ];
 
   return (
     <>
@@ -62,11 +70,8 @@ const Organizers = () => {
       </div>
       <Dropdown
         className={'mb-4'}
-        buttonLabel={`All ${category.name}`}
-        menuItems={category.subcategories.map((sub, index) => ({
-          label: sub,
-          link: `/category/${toSlug(category.name)}/?subcategorySlug=${toSlug(sub)}`,
-        }))}
+        buttonLabel={subCategoryName ? subCategoryName : `All ${category.name}`}
+        menuItems={menuItems}
       />
       <div>
         <p>Total events: 42</p>

@@ -19,7 +19,6 @@ const AuthForm = ({ isLogin }) => {
   const [formError, setFormError] = useState('');
 
   const dispatch = useDispatch();
-  const { loading, error } = useSelector(state => state.auth);
 
   const isEmailValid = /^\S+@\S+\.\S+$/.test(email) && email.length <= 320;
 
@@ -40,7 +39,6 @@ const AuthForm = ({ isLogin }) => {
         }, 3000);
       });
   };
-  if (loading) return <LoadingContainer content="Signing you in..." />;
 
   return (
     <>
@@ -51,8 +49,8 @@ const AuthForm = ({ isLogin }) => {
         ></div>
       </div>
       <form className="p-10 flex flex-col justify-center" onSubmit={handleSubmit}>
-        {!loading && !isRoleChoosen && <RoleSelector onSelect={handleRoleChange} />}
-        {!loading && isRoleChoosen && (
+        {!isRoleChoosen && <RoleSelector onSelect={handleRoleChange} />}
+        {isRoleChoosen && (
           <>
             <p className="mb-4 text-sm text-gray-600">
               If you don’t have an account you will be prompted to create one.

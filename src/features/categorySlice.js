@@ -1,49 +1,17 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getCategories } from '../api/core';
 
 export const fetchCategories = createAsyncThunk('category/fetchCategories', async (_, thunkAPI) => {
   try {
-    const response = await axios.get('/api/categories');
-    return response.data;
+    const res = await getCategories();
+    return res.data;
   } catch (err) {
-    return thunkAPI.rejectWithValue(err.response?.data || 'Failed to fetch categories');
+    return thunkAPI.rejectWithValue(err.res?.data || 'Failed to fetch categories');
   }
 });
 
 const initialState = {
-  categories: [
-    {
-      name: 'Concerts',
-      subcategories: ['Pop', 'Rock', 'Jazz'],
-    },
-    {
-      name: 'Sports',
-      subcategories: ['Football', 'Basketball', 'Tennis'],
-    },
-    {
-      name: 'Arts, Theater & Comedy',
-      subcategories: ['Stand-up', 'Drama', 'Musical'],
-    },
-    {
-      name: 'Family',
-      subcategories: ['Magic Show', 'Puppet', 'Fairy Tales'],
-    },
-    {
-      name: 'Festivals',
-      subcategories: ['Food', 'Music', 'Cultural'],
-    },
-    {
-      name: 'Film',
-      subcategories: ['Action', 'Drama', 'Documentary'],
-    },
-    {
-      name: 'Dance',
-      subcategories: ['Ballet', 'Hip Hop', 'Folk'],
-    },
-    {
-      name: 'Gaming',
-      subcategories: ['eSports', 'LAN Party', 'VR Gaming'],
-    },
-  ],
+  categories: [],
   selectedCategory: null,
   loading: false,
   error: null,
@@ -68,7 +36,7 @@ const categorySlice = createSlice({
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = action.payload;
+        state.categories = action.payload.results;
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;

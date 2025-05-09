@@ -1,4 +1,5 @@
 import { logout, setCredentials } from '../features/authSlice';
+import { fetchCategories } from '../features/categorySlice';
 
 export const loadInitialData = () => async dispatch => {
   const token = localStorage.getItem('AT');
@@ -11,9 +12,7 @@ export const loadInitialData = () => async dispatch => {
   }
 
   try {
-    await Promise.all([
-      // dispatch(fetchCategories())
-    ]);
+    await Promise.all([dispatch(fetchCategories())]);
   } catch (err) {
     console.error('Error loading initial data:', err);
   }

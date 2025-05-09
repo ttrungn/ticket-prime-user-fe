@@ -46,11 +46,17 @@ const Dropdown = ({ className, buttonLabel, menuItems }) => {
       >
         <div role="none">
           {menuItems.map((item, index) => (
-            <div className="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <Link key={index} to={item.link || '#'} role="menuitem" tabIndex="-1" id={`menu-item-${index}`}>
-                <span className="text-black">{item.label}</span>
-              </Link>
-            </div>
+            <Link
+              key={index}
+              to={item.link || '#'}
+              className="block px-4 py-2 hover:bg-gray-100"
+              role="menuitem"
+              tabIndex="-1"
+              id={`menu-item-${index}`}
+              onClick={() => setIsOpen(false)}
+            >
+              <span className="text-black">{item.label}</span>
+            </Link>
           ))}
         </div>
       </div>
